@@ -69,6 +69,14 @@ function ARow({ rowData }: { rowData: EmployeeType }) {
         </div>
       </TableCell>
       <TableCell>
+        {rowData.sig ? (
+          <Avatar>
+            <AvatarImage src={rowData.sig} />
+            <AvatarFallback>DG</AvatarFallback>
+          </Avatar>
+        ) : (
+          ""
+        )}
         <CustomUploadButton uploadFor="signature" rowData={rowData} />
       </TableCell>
     </TableRow>
