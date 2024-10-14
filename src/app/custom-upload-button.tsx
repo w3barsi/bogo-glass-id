@@ -4,10 +4,14 @@ import { useUploadThing } from "~/utils/uploadthing";
 import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { type EmployeeType } from "~/server/db/schema";
+import { type ReactNode } from "react";
+import { Button } from "~/components/ui/button";
+import { EmployeeOnlyType } from "./types";
 
 type CustomUploadButtonProps = {
   uploadFor: "picture" | "signature";
-  rowData: EmployeeType;
+  rowData: EmployeeOnlyType;
+  children: ReactNode;
 };
 
 export default function CustomUploadButton(props: CustomUploadButtonProps) {
@@ -16,7 +20,7 @@ export default function CustomUploadButton(props: CustomUploadButtonProps) {
 
   const utils = api.useUtils();
 
-  const { startUpload, routeConfig } = useUploadThing("imageUploader", {
+  const { startUpload } = useUploadThing("imageUploader", {
     onClientUploadComplete: async () => {
       toast.success(
         `${props.uploadFor === "picture" ? "Picture" : "Signature"} uploaded for ${rowData.fullName}`,
@@ -51,7 +55,8 @@ export default function CustomUploadButton(props: CustomUploadButtonProps) {
           lastModified: oldFile.lastModified,
         },
       );
-      console.log(newFile, rowData);
+      // console.log(newFile, rowData);
+      console.log(uploadFor);
       await startUpload([newFile], {
         ...rowData,
         uploadFor: uploadFor,
@@ -60,22 +65,16 @@ export default function CustomUploadButton(props: CustomUploadButtonProps) {
   };
 
   return (
-    <label
-      className="inline-flex h-9 cursor-pointer items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-      htmlFor={`${rowData.id}`}
-    >
-      <span>
-        Upload {uploadFor === "picture" ? "Picture" : "Signature"} for{" "}
-        {rowData.fullName}
-      </span>
+    <label htmlFor={`${rowData.id}_${uploadFor}`} className="cursor-pointer">
+      <span>{props.children ? props.children : "Take Picture"}</span>
       <Input
         type="file"
         capture="environment"
         className="hidden"
-        id={`${rowData.id}`}
+        id={`${rowData.id}_${uploadFor}`}
         accept="image/*"
         onChange={handleFileChange}
-        onClick={(e) => console.log(rowData.fullName)}
+        onClick={(e) => console.log(rowData)}
       />
     </label>
   );

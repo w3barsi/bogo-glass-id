@@ -11,94 +11,154 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { useState } from "react";
-import { Input } from "~/components/ui/input";
-import CustomUploadButton from "./custom-upload-button";
 import { api } from "~/trpc/react";
-import { Button } from "~/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import {
+  type ColumnDef,
+  type FilterFn,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 
-export function DataTable(props: { initialData: EmployeeType[] }) {
-  const { data } = api.employee.getEmployees.useQuery(undefined, {
-    initialData: props.initialData,
+import { type RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
+import { Input } from "~/components/ui/input";
+import Image from "next/image";
+import { EmployeeOnlyType } from "./types";
+import PictureCell from "./picture-cell";
+
+declare module "@tanstack/react-table" {
+  //add fuzzy filter to the filterFns
+  interface FilterFns {
+    fuzzy: FilterFn<unknown>;
+  }
+  interface FilterMeta {
+    itemRank: RankingInfo;
+  }
+}
+
+const columns: ColumnDef<EmployeeType>[] = [
+  {
+    accessorKey: "id",
+    header: "id",
+  },
+  {
+    accessorKey: "fullName",
+    cell: ({ row }) => {
+      return <div className="w-full">{row.getValue("fullName")}</div>;
+    },
+  },
+  {
+    accessorKey: "pic",
+    cell: ({ row }) => {
+      const rowData: EmployeeOnlyType = {
+        fullName: row.getValue("fullName"),
+        pic: row.getValue("pic"),
+        sig: row.getValue("sig"),
+        id: row.getValue("id"),
+      };
+
+      return <PictureCell rowData={rowData} uploadFor="picture" />;
+    },
+  },
+  {
+    accessorKey: "sig",
+    cell: ({ row }) => {
+      const rowData: EmployeeOnlyType = {
+        fullName: row.getValue("fullName"),
+        pic: row.getValue("pic"),
+        sig: row.getValue("sig"),
+        id: row.getValue("id"),
+      };
+
+      return <PictureCell rowData={rowData} uploadFor="signature" />;
+    },
+  },
+];
+
+// Define a custom fuzzy filter function that will apply ranking info to rows (using match-sorter utils)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const itemRank = rankItem(row.getValue(columnId), value);
+
+  // Store the itemRank info
+  addMeta({
+    itemRank,
   });
-  const [globalFilter, setGlobalFilters] = useState("");
+
+  // Return if the item should be filtered in/out
+  return itemRank.passed;
+};
+
+export function DataTable() {
+  const [data] = api.employee.getEmployees.useSuspenseQuery();
+  const [globalFilter, setGlobalFilter] = useState("");
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: "fuzzy",
+    filterFns: {
+      fuzzy: fuzzyFilter, //define as a filter function that can be used in column definitions
+    },
+    state: {
+      globalFilter,
+    },
+  });
 
   return (
     <div className="flex flex-col gap-2">
-      <Input
-        placeholder="Search all columns"
-        value={globalFilter ?? ""}
-        onChange={(event) => setGlobalFilters(String(event.target.value))}
-        className="max-w-sm"
-      />
+      <div>
+        <Input onChange={(e) => setGlobalFilter(e.target.value)} />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Full Name</TableHead>
-              <TableHead>Picture</TableHead>
-              <TableHead>Signature</TableHead>
+              <TableHead className="h-full w-5">ID</TableHead>
+              <TableHead className="h-full min-w-64">Full Name</TableHead>
+              <TableHead className="w-12 min-w-36 text-center">
+                Picture
+              </TableHead>
+              <TableHead className="w-12 min-w-36 text-center">
+                Signature
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((row) => {
-              return <ARow key={row.id} rowData={row} />;
-            })}
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
     </div>
-  );
-}
-
-function ARow({ rowData }: { rowData: EmployeeType }) {
-  return (
-    <TableRow>
-      <TableCell className="font-medium">{rowData.fullName}</TableCell>
-      <TableCell>
-        <div className="flex flex-row">
-          {rowData.pic ? (
-            <Avatar>
-              <AvatarImage src={rowData.pic} />
-              <AvatarFallback>DG</AvatarFallback>
-            </Avatar>
-          ) : (
-            ""
-          )}
-          <CustomUploadButton uploadFor="picture" rowData={rowData} />
-        </div>
-      </TableCell>
-      <TableCell>
-        {rowData.sig ? (
-          <Avatar>
-            <AvatarImage src={rowData.sig} />
-            <AvatarFallback>DG</AvatarFallback>
-          </Avatar>
-        ) : (
-          ""
-        )}
-        <CustomUploadButton uploadFor="signature" rowData={rowData} />
-      </TableCell>
-    </TableRow>
-  );
-}
-
-function Why(props: { rowData: EmployeeType }) {
-  const rowData = props.rowData;
-
-  return (
-    <label
-      className="inline-flex h-9 cursor-pointer items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-      htmlFor="pic"
-    >
-      <span>{rowData.fullName}</span>
-      <Input
-        type="file"
-        capture="environment"
-        className="hidden"
-        id="pic"
-        accept="image/*"
-      />
-    </label>
   );
 }

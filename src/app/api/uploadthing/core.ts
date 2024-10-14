@@ -27,6 +27,7 @@ export const ourFileRouter = {
     .onUploadComplete(async ({ metadata, file }) => {
       // This code RUNS ON YOUR SERVER after upload
       console.log("Upload complete @ ", file.url);
+      console.log(metadata.input.uploadFor)
       if (metadata.input.uploadFor === "picture") {
         await api.employee.updatePicture({ id: metadata.input.id, url: file.url })
       } else {
