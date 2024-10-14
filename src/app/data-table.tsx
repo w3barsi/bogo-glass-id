@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
 import {
   type ColumnDef,
@@ -95,6 +95,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 export function DataTable() {
   const [data] = api.employee.getEmployees.useSuspenseQuery();
   const [globalFilter, setGlobalFilter] = useState("");
+  const [hasPic, setHasPic] = useState(0);
   const table = useReactTable({
     data,
     columns,
@@ -110,10 +111,17 @@ export function DataTable() {
     },
   });
 
+  useEffect(() => {
+    setHasPic(data.filter((e) => e.pic !== null).length);
+  }, [data]);
+
   return (
     <div className="flex flex-col gap-2">
-      <div>
+      <div className="flex items-center gap-2 text-center">
         <Input onChange={(e) => setGlobalFilter(e.target.value)} />
+        <span className="text-nowrap">
+          {hasPic}/{data.length}
+        </span>
       </div>
       <div className="rounded-md border">
         <Table>
