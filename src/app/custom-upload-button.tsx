@@ -49,7 +49,7 @@ export default function CustomUploadButton(props: CustomUploadButtonProps) {
       if (!oldFile) return toast.error("Error handling file");
       const newFile = new File(
         [oldFile],
-        rowData.fullName.replace(",", "").replace(".", "").split(" ").join(""),
+        `${rowData.fullName.replace(",", "").replace(".", "").split(" ").join("")}.jpg`,
         {
           type: oldFile.type,
           lastModified: oldFile.lastModified,
