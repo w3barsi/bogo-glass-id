@@ -91,9 +91,11 @@ export default function PictureCell(props: {
         <DropdownMenuTrigger>
           <div className="relative h-10 w-10 overflow-hidden rounded-full object-cover">
             <img
+              loading="lazy"
               src={imgLink}
               alt={rowData.fullName}
               className="rounded object-cover object-center"
+              decoding="async"
             />
           </div>
         </DropdownMenuTrigger>
