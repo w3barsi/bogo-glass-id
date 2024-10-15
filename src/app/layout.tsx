@@ -15,6 +15,7 @@ import Head from "next/head";
 export const metadata: Metadata = {
   title: "Bogo Glass ID",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
 
 export default function RootLayout({
