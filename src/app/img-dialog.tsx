@@ -15,13 +15,13 @@ export default function ImgDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className=" h-[90%] max-w-[90%]">
-        <div>
-          <img
-            src={link}
-            alt="BIG IMAGE"
-            className="absolute h-full w-full rounded-sm object-contain object-center sm:rounded-lg"
-          />
-        </div>
+        <Image
+          width={766}
+          height={0}
+          src={link}
+          alt="BIG IMAGE"
+          className="absolute h-full w-full rounded-sm object-contain object-center sm:rounded-lg"
+        />
       </DialogContent>
     </Dialog>
   );
