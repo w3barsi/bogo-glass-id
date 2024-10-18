@@ -1,4 +1,5 @@
 "use client";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,7 +11,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
-import CustomUploadButton from "./custom-upload-button";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -18,13 +18,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-
-import { EmployeeOnlyType } from "./types";
-import Image from "next/image";
 import { api } from "~/trpc/react";
+import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import CustomUploadButton from "./custom-upload-button";
 import { useImgDialogStore } from "./store";
+import { EmployeeOnlyType } from "./types";
 
 export default function PictureCell(props: {
   rowData: EmployeeOnlyType;
@@ -90,12 +91,11 @@ export default function PictureCell(props: {
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger>
           <div className="relative h-10 w-10 overflow-hidden rounded-full object-cover">
-            <img
-              loading="lazy"
+            <Image
               src={imgLink}
+              fill={true}
               alt={rowData.fullName}
               className="rounded object-cover object-center"
-              decoding="async"
             />
           </div>
         </DropdownMenuTrigger>

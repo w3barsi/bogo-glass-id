@@ -8,10 +8,9 @@
  */
 import { currentUser } from "@clerk/nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
+import { db } from "~/server/db";
 import superjson from "superjson";
 import { ZodError } from "zod";
-
-import { db } from "~/server/db";
 
 /**
  * 1. CONTEXT
@@ -26,7 +25,7 @@ import { db } from "~/server/db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const user = await currentUser()
+  const user = await currentUser();
   return {
     db,
     session: user,
@@ -120,4 +119,3 @@ export const protectedProcedure = t.procedure
       },
     });
   });
-
