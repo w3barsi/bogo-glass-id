@@ -1,7 +1,15 @@
 "use client";
 
-import { type EmployeeType } from "~/server/db/schema";
-
+import { rankItem, type RankingInfo } from "@tanstack/match-sorter-utils";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  useReactTable,
+  type ColumnDef,
+  type FilterFn,
+} from "@tanstack/react-table";
+import { Input } from "~/components/ui/input";
 import {
   Table,
   TableBody,
@@ -10,22 +18,13 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { useEffect, useState } from "react";
+import { type EmployeeType } from "~/server/db/schema";
 import { api } from "~/trpc/react";
-import {
-  type ColumnDef,
-  type FilterFn,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-
-import { type RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
-import { Input } from "~/components/ui/input";
 import Image from "next/image";
-import { EmployeeOnlyType } from "./types";
+import { useEffect, useState } from "react";
+
 import PictureCell from "./picture-cell";
+import { EmployeeOnlyType } from "./types";
 
 declare module "@tanstack/react-table" {
   //add fuzzy filter to the filterFns

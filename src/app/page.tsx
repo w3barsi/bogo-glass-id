@@ -1,8 +1,9 @@
-import { api, HydrateClient } from "~/trpc/server";
 import { UserButton } from "@clerk/nextjs";
+import { api, HydrateClient } from "~/trpc/server";
+import Head from "next/head";
+
 import { DataTable } from "./data-table";
 import ImgDialog from "./img-dialog";
-import Head from "next/head";
 
 export default async function Home() {
   void api.employee.getEmployees.prefetch();
