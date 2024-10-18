@@ -16,8 +16,7 @@ export default function ImgDialog() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className=" h-[90%] max-w-[90%]">
         <div>
-          <Image
-            fill={true}
+          <img
             src={link}
             alt="BIG IMAGE"
             className="absolute h-full w-full rounded-sm object-contain object-center sm:rounded-lg"

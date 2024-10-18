@@ -12,6 +12,7 @@ import {
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
+import { DialogTitle } from "~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +35,7 @@ export default function PictureCell(props: {
   const rowData = props.rowData;
   const imgLink = props.uploadFor === "picture" ? rowData.pic : rowData.sig;
 
-  const { setIsOpen } = useImgDialogStore();
+  const { setIsOpen: setIsDialogOpen } = useImgDialogStore();
   const { setLink } = useImgDialogStore();
   const utils = api.useUtils();
 
@@ -83,7 +84,7 @@ export default function PictureCell(props: {
   const handleViewPicture = () => {
     setLink(rowData.pic!);
     setOpen(false);
-    setIsOpen(true);
+    setIsDialogOpen(true);
   };
 
   return (
@@ -93,9 +94,10 @@ export default function PictureCell(props: {
           <div className="relative h-10 w-10 overflow-hidden rounded-full object-cover">
             <Image
               src={imgLink}
-              fill={true}
+              height={0}
+              width={80}
               alt={rowData.fullName}
-              className="rounded object-cover object-center"
+              className="rounded h-full w-full object-cover object-center"
             />
           </div>
         </DropdownMenuTrigger>
